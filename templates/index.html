@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sudoku Solver</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --text: #2d3436;
+            --bg: #f0f2f5;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container { 
+            width: 90%;
+            max-width: 500px; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        }
+
+        h1 { font-weight: 800; margin-bottom: 10px; font-size: 28px; }
+        p { color: #636e72; margin-bottom: 30px; line-height: 1.5; }
+
+        .upload-area {
+            border: 2px dashed #dfe6e9;
+            padding: 30px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover { border-color: var(--primary); background: #f8fbff; }
+
+        input[type="file"] { margin-bottom: 10px; }
+
+        button { 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            width: 100%;
+            padding: 15px; 
+            font-size: 16px; 
+            font-weight: 600;
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        button:hover { background-color: #357abd; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+
+        #result-message { 
+            margin-top: 25px; 
+            font-weight: 600; 
+            min-height: 24px;
+        }
+
+        .image-container { 
+            margin-top: 30px; 
+            display: none; 
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .image-container img { 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+        }
+
+        h3 { font-size: 18px; margin-bottom: 15px; color: var(--text); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧩 Sudoku AI</h1>
+    <p>Snap a photo or upload a screenshot. Our AI will handle the rest.</p>
+    
+    <form id="upload-form">
+        <div class="upload-area">
+            <input type="file" id="imageInput" accept="image/*" required>
+        </div>
+        <button type="submit" id="solveBtn">Solve Puzzle</button>
+    </form>
+
+    <div id="result-message"></div>
+    
+    <div id="image-wrapper" class="image-container">
+        <h3>💡 Solution Found:</h3>
+        <img id="solved-image" src="" alt="Sudoku Solution">
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('upload-form');
+    const solveBtn = document.getElementById('solveBtn');
+    const messageDiv = document.getElementById('result-message');
+    const imageWrapper = document.getElementById('image-wrapper');
+    const solvedImg = document.getElementById('solved-image');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById('imageInput');
+        
+        // UI Feedback
+        solveBtn.disabled = true;
+        solveBtn.innerText = "Processing...";
+        messageDiv.innerText = "Reading board numbers...";
+        messageDiv.style.color = "#4a90e2";
+        imageWrapper.style.display = "none";
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            const response = await fetch('/solve', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (data.image_url) {
+                messageDiv.style.color = "#2ecc71";
+                messageDiv.innerText = "✔ Puzzle Solved Successfully!";
+                solvedImg.src = data.image_url + "?t=" + new Date().getTime();
+                imageWrapper.style.display = "block";
+            } else {
+                messageDiv.style.color = "#e74c3c";
+                messageDiv.innerText = "❌ " + data.message;
+            }
+        } catch (error) {
+            messageDiv.style.color = "#e74c3c";
+            messageDiv.innerText = "Connection error. Is the server running?";
+        } finally {
+            solveBtn.disabled = false;
+            solveBtn.innerText = "Solve Puzzle";
+        }
+    });
+</script>
+
+</body>
+</html>
