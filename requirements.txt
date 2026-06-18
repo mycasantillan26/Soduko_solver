@@ -3,3 +3,4 @@ gunicorn
 opencv-python-headless
 numpy
 tensorflow==2.15.0
+imutils
