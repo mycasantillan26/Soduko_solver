@@ -132,7 +132,7 @@
         formData.append('file', fileInput.files[0]);
 
         try {
-            const response = await fetch('/solve', { method: 'POST', body: formData });
+            const response = await fetch('https://soduko-solver-u0mz.onrender.com/solve', { method: 'POST', body: formData });
             const data = await response.json();
 
             if (data.image_url) {
