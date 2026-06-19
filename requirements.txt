@@ -5,3 +5,6 @@ opencv-python-headless
 numpy
 tensorflow==2.15.0
 imutils
+
+
+#C:\Users\Techboy\anaconda3\envs\sudoku\python.exe app.py
